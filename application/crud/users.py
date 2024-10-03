@@ -8,7 +8,7 @@ from application.core.schemas.user import SUserCreate, SUser
 from application.utils.auth_user import get_password_hash
 
 
-async def create_user(
+async def add_user(
         position: PositionType,
         user_data: SUserCreate,
         session: AsyncSession

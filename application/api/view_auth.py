@@ -8,7 +8,7 @@ from application.core.exception.user_exception import UserNotFound, InvalidPassw
 from application.core.models.db_helper import db_helper
 from application.core.models.user import PositionType
 from application.core.schemas.user import SUserLog, SUser, SUserCreate
-from application.crud.users import create_user
+from application.crud.users import add_user, get_user
 from application.utils.auth_user import create_access_token
 from application.utils.dependencies import authenticate_user
 
@@ -26,13 +26,17 @@ async def register_user(
             AsyncSession,
             Depends(db_helper.session_getter)
         ]
-) -> SUser:
-    user = await create_user(
-        position,
-        user_data,
-        session
-    )
-    return user
+) -> SUser | dict:
+    current_user = await get_user(session, email=user_data.email)
+    if not current_user:
+        user = await add_user(
+            position,
+            user_data,
+            session
+        )
+        return user
+    else:
+        return {"status": "Пользователь с таким e-mail уже существует"}
 
 
 @router.post("/login")
@@ -59,7 +63,11 @@ async def login_user(
         )
 
         # Создаем JWT-токен с информацией о пользователе
-        access_token = create_access_token({"sub": str(user.id)})
+        access_token = create_access_token({
+            "sub": str(user.id),
+            "admin": str(user.is_director)
+        }
+        )
 
         # Устанавливаем токен в cookies, делая его доступным только через HTTP
         response.set_cookie("access_token", access_token, httponly=True)
