@@ -39,7 +39,14 @@ async def update_project(
         session: AsyncSession,
         date_update: SProject
 ):
-    stmt = update(Project).values(name=date_update.name, description=date_update.description).filter_by(name=name_project).returning(Project)
+    stmt = (
+        update(Project)
+        .filter_by(name=name_project)
+        .values(
+            name=date_update.name,
+            description=date_update.description
+        )
+        .returning(Project))
     up_project = await session.execute(stmt)
     await session.commit()
     return up_project.scalar_one_or_none()

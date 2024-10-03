@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class STask(BaseModel):
@@ -16,8 +16,9 @@ class ReadTask(BaseModel):
     name: str
     project_name: str
     description: str
-    date_from: str
-    date_to: str
-    contractor_email: str
+    date_from: date
+    date_to: date
+    contractor_email: EmailStr
+    type_task: str
     status: str
 
