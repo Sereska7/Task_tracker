@@ -5,12 +5,11 @@ from pydantic import BaseModel
 
 class STask(BaseModel):
     name: str
-    project_id: id
+    project_id: int
     description: str
     date_from: date
     date_to: date
     contractor: int
-    status: str
 
 
 class ReadTask(BaseModel):

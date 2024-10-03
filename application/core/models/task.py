@@ -16,6 +16,12 @@ class TaskStatus(Enum):
     COMPLETED = 'Выполнено'
 
 
+class TypeTask(Enum):
+    DEVELOPER = 'Developer'
+    MANAGER = 'Manager'
+    TESTER = 'Tester'
+
+
 class Task(Base):
 
     name: Mapped[str] = mapped_column(String(60))
@@ -24,7 +30,8 @@ class Task(Base):
     date_from: Mapped[date] = mapped_column(Date)
     date_to: Mapped[date] = mapped_column(Date)
     contractor: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    status: Mapped[TaskStatus] = mapped_column(SQLEnum(TaskStatus), nullable=False)
+    type_task: Mapped[TypeTask] = mapped_column(SQLEnum(TypeTask), nullable=False)
+    status: Mapped[TaskStatus] = mapped_column(SQLEnum(TaskStatus), default=TaskStatus.PENDING)
 
     user: Mapped["User"] = relationship(back_populates="task")
     project: Mapped["Project"] = relationship(back_populates="task")

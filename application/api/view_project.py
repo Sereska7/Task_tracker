@@ -33,7 +33,7 @@ async def create_project(
 
 @router.patch("/update_{name}")
 async def change_project(
-        product_id: id,
+        product_id: int,
         date_update: SProject,
         session: Annotated[
             AsyncSession,
