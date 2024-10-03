@@ -1,26 +1,24 @@
 """Add TypeTask (Enum)
 
-Revision ID: cbb9f5f3e300
+Revision ID: cf3b8e8226cb
 Revises: cff49413b9e5
-Create Date: 2024-10-03 18:14:11.055406
+Create Date: 2024-10-03 18:34:57.873691
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import Enum
+from sqlalchemy.dialects.postgresql import ENUM
 
 # revision identifiers, used by Alembic.
-revision: str = 'cbb9f5f3e300'
+revision: str = 'cf3b8e8226cb'
 down_revision: Union[str, None] = 'cff49413b9e5'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-# Определение ENUM типа
-typetask_enum = Enum('Developer', 'Manager', 'Tester', name='typetask')
-
+typetask_enum = ENUM('DEVELOPER', 'MANAGER', 'TESTER', name='typetask')
 
 def upgrade() -> None:
     # Создание ENUM типа
