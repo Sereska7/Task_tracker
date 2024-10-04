@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 
 class PositionType(Enum):
-    DEVELOPER = 'Developer'
-    MANAGER = 'Manager'
-    TESTER = 'Tester'
+    DEVELOPER = "Developer"
+    MANAGER = "Manager"
+    TESTER = "Tester"
 
 
 class User(Base):
@@ -21,7 +21,9 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(30))
     email: Mapped[str] = mapped_column(String(50), unique=True)
     hash_password: Mapped[str] = mapped_column()
-    position: Mapped[PositionType] = mapped_column(SQLEnum(PositionType), nullable=False)
+    position: Mapped[PositionType] = mapped_column(
+        SQLEnum(PositionType), nullable=False
+    )
     is_director: Mapped[bool] = mapped_column(default=False)
 
     task: Mapped["Task"] = relationship(back_populates="user")

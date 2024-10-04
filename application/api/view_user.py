@@ -9,19 +9,13 @@ from application.core.schemas.user import SUser
 from application.crud.users import get_my_profile
 from application.utils.dependencies import get_current_user
 
-router = APIRouter(
-    tags=["User"],
-    prefix="/user"
-)
+router = APIRouter(tags=["User"], prefix="/user")
 
 
 @router.get("/my_profile")
 async def get_profile(
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        current_user: User = Depends(get_current_user)
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_user),
 ) -> SUser:
     profile = await get_my_profile(current_user.id, session)
     return profile

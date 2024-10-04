@@ -1,8 +1,4 @@
-__all__ = (
-    "User",
-    "Project",
-    "Task"
-)
+__all__ = ("User", "Project", "Task")
 
 from application.core.models.project import Project
 from application.core.models.user import User

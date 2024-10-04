@@ -12,28 +12,18 @@ from application.crud.users import add_user, get_user
 from application.utils.auth_user import create_access_token
 from application.utils.dependencies import authenticate_user
 
-router = APIRouter(
-    tags=["Auth"],
-    prefix="/auth"
-)
+router = APIRouter(tags=["Auth"], prefix="/auth")
 
 
 @router.post("/register")
 async def register_user(
-        user_data: SUserCreate,
-        position: PositionType,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ]
+    user_data: SUserCreate,
+    position: PositionType,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ) -> SUser | dict:
     current_user = await get_user(session, email=user_data.email)
     if not current_user:
-        user = await add_user(
-            position,
-            user_data,
-            session
-        )
+        user = await add_user(position, user_data, session)
         return user
     else:
         return {"status": "Пользователь с таким e-mail уже существует"}
@@ -41,32 +31,23 @@ async def register_user(
 
 @router.post("/login")
 async def login_user(
-        response: Response,
-        user_data: SUserLog,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ]
+    response: Response,
+    user_data: SUserLog,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
     """
-        Эта функция обрабатывает запрос на вход пользователя.
-        Она проверяет правильность email и пароля, а затем создает и сохраняет
-        JWT-токен в cookies ответа.
-        """
+    Эта функция обрабатывает запрос на вход пользователя.
+    Она проверяет правильность email и пароля, а затем создает и сохраняет
+    JWT-токен в cookies ответа.
+    """
 
     try:
         # Аутентифицируем пользователя по email и паролю
-        user = await authenticate_user(
-            user_data.email,
-            user_data.password,
-            session
-        )
+        user = await authenticate_user(user_data.email, user_data.password, session)
 
         # Создаем JWT-токен с информацией о пользователе
-        access_token = create_access_token({
-            "sub": str(user.id),
-            "admin": str(user.is_director)
-        }
+        access_token = create_access_token(
+            {"sub": str(user.id), "admin": str(user.is_director)}
         )
 
         # Устанавливаем токен в cookies, делая его доступным только через HTTP

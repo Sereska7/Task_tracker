@@ -8,9 +8,7 @@ from application.utils.auth_user import get_password_hash
 
 
 async def add_user(
-        position: PositionType,
-        user_data: SUserCreate,
-        session: AsyncSession
+    position: PositionType, user_data: SUserCreate, session: AsyncSession
 ) -> SUser:
     hash_password = get_password_hash(user_data.password)
     user = User(
@@ -24,19 +22,13 @@ async def add_user(
     return user
 
 
-async def get_user(
-        session: AsyncSession,
-        **data: dict
-):
+async def get_user(session: AsyncSession, **data: dict):
     stmt = select(User.__table__.columns).filter_by(**data)
     user = await session.execute(stmt)
     return user.mappings().one_or_none()
 
 
-async def get_my_profile(
-        user_id: int,
-        session: AsyncSession
-):
+async def get_my_profile(user_id: int, session: AsyncSession):
     stmt = select(User).where(User.id == user_id)
     user = await session.execute(stmt)
     return user.scalar()

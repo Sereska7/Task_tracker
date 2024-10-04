@@ -6,20 +6,21 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date
 
 from application.core.models.base import Base
+
 if TYPE_CHECKING:
     from application.core.models import Project, User
 
 
 class TaskStatus(Enum):
-    PENDING = 'Ожидание'
-    IN_PROGRESS = 'В работе'
-    COMPLETED = 'Выполнено'
+    PENDING = "Ожидание"
+    IN_PROGRESS = "В работе"
+    COMPLETED = "Выполнено"
 
 
 class TypeTask(Enum):
-    DEVELOPER = 'Developer'
-    MANAGER = 'Manager'
-    TESTER = 'Tester'
+    DEVELOPER = "Developer"
+    MANAGER = "Manager"
+    TESTER = "Tester"
 
 
 class Task(Base):
@@ -31,7 +32,9 @@ class Task(Base):
     date_to: Mapped[date] = mapped_column(Date)
     contractor: Mapped[int] = mapped_column(ForeignKey("users.id"))
     type_task: Mapped[TypeTask] = mapped_column(SQLEnum(TypeTask), nullable=False)
-    status: Mapped[TaskStatus] = mapped_column(SQLEnum(TaskStatus), default=TaskStatus.PENDING)
+    status: Mapped[TaskStatus] = mapped_column(
+        SQLEnum(TaskStatus), default=TaskStatus.PENDING
+    )
 
     user: Mapped["User"] = relationship(back_populates="task")
     project: Mapped["Project"] = relationship(back_populates="task")

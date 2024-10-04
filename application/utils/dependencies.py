@@ -6,25 +6,26 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.core.config import settings
-from application.core.exception.user_exception import TokenNotFound, InvalidPasswordError, UserNotFound
+from application.core.exception.user_exception import (
+    TokenNotFound,
+    InvalidPasswordError,
+    UserNotFound,
+)
 from application.core.models.db_helper import db_helper
 from application.crud.users import get_user
 from application.utils.auth_user import verify_password
 
 
 async def authenticate_user(
-        email: EmailStr,
-        password: str,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ]
+    email: EmailStr,
+    password: str,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
     """
-        Аутентификация пользователя.
+    Аутентификация пользователя.
 
-        Проверяет наличие пользователя с указанным email и соответствие пароля.
-        """
+    Проверяет наличие пользователя с указанным email и соответствие пароля.
+    """
 
     # Ищем пользователя по email в базе данных
     user = await get_user(session, email=email)
@@ -57,11 +58,8 @@ def get_token(request: Request):
 
 
 async def get_current_user(
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        token: str = Depends(get_token)
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    token: str = Depends(get_token),
 ):
     """
     Получает текущего пользователя по JWT-токену.

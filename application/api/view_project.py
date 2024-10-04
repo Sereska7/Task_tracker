@@ -6,23 +6,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from application.core.models import User
 from application.core.models.db_helper import db_helper
 from application.core.schemas.project import SProject
-from application.crud.projects import add_project, get_project, update_project, get_all_projects, del_project
+from application.crud.projects import (
+    add_project,
+    get_project,
+    update_project,
+    get_all_projects,
+    del_project,
+)
 from application.utils.dependencies import get_current_user
 
-router = APIRouter(
-    tags=["Project"],
-    prefix="/project"
-)
+router = APIRouter(tags=["Project"], prefix="/project")
 
 
 @router.post("/create")
 async def create_project(
-        data_project: SProject,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        current_user: User = Depends(get_current_user)
+    data_project: SProject,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_user),
 ) -> SProject | dict:
     if current_user.is_director:
         project = await add_project(data_project, session)
@@ -33,13 +33,10 @@ async def create_project(
 
 @router.patch("/update_{name}")
 async def change_project(
-        product_id: int,
-        date_update: SProject,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        current_user: User = Depends(get_current_user)
+    product_id: int,
+    date_update: SProject,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_user),
 ) -> SProject | dict:
     if current_user.is_director:
         project = await get_project(session, id=product_id)
@@ -54,11 +51,8 @@ async def change_project(
 
 @router.get("/get")
 async def get_projects(
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        current_user: User = Depends(get_current_user)
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_user),
 ) -> List[SProject] | dict:
     projects = await get_all_projects(session)
     return projects
@@ -66,12 +60,9 @@ async def get_projects(
 
 @router.delete("/delete")
 async def delete_project(
-        project_id: int,
-        session: Annotated[
-            AsyncSession,
-            Depends(db_helper.session_getter)
-        ],
-        current_user: User = Depends(get_current_user)
+    project_id: int,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     if current_user.is_director:
         return {"message": "У пользователя нет прав доступа"}

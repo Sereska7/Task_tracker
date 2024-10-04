@@ -48,4 +48,3 @@ class ReadTask(BaseModel):
     contractor_email: EmailStr
     type_task: str
     status: str
-
