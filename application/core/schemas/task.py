@@ -34,6 +34,7 @@ class SMyTask(BaseModel):
     name: str
     project_name: str
     description: str
+    contractor_email: str
     date_from: date
     date_to: date
     status: str
@@ -45,6 +46,5 @@ class ReadTask(BaseModel):
     description: str
     date_from: date
     date_to: date
-    contractor_email: EmailStr
     type_task: str
     status: str

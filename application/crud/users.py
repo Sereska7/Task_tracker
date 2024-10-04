@@ -8,12 +8,12 @@ from application.utils.auth_user import get_password_hash
 
 
 async def add_user(
-    position: PositionType, user_data: SUserCreate, session: AsyncSession
+    name: str, position: str, email: str, password: str, session: AsyncSession
 ) -> SUser:
-    hash_password = get_password_hash(user_data.password)
+    hash_password = get_password_hash(password)
     user = User(
-        name=user_data.name,
-        email=user_data.email,
+        name=name,
+        email=email,
         hash_password=hash_password,
         position=position,
     )

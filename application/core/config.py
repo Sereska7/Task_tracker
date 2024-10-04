@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
 
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
+
+    SMTP_HOST: str
+    SMTP_PORT: int
+
     model_config = SettingsConfigDict(env_file="/.env")
 
 

@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from application.core.models import Task, User, Project
 from application.core.models.task import TypeTask
 from application.core.schemas.task import (
-    ReadTask,
     STask,
     SChangeTask,
     SMyTask,
@@ -43,7 +42,7 @@ async def get_tasks_by_project(project_id: int, session: AsyncSession):
 async def get_task_by_id(
     task_id: int,
     session: AsyncSession,
-) -> List[SMyTask]:
+) -> SMyTask:
     stmt = (
         select(
             User.email.label("contractor_email"),
@@ -61,7 +60,7 @@ async def get_task_by_id(
         .order_by(Task.date_to)
     )
     result = await session.execute(stmt)
-    return result.mappings().all()
+    return result.one_or_none()
 
 
 async def get_my_tasks(

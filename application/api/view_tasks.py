@@ -3,6 +3,7 @@ from typing import Annotated, List, Dict
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from application.background_tasks.send_message import send_email_confirmation_code
 from application.core.models import User
 from application.core.models.db_helper import db_helper
 from application.core.models.task import TypeTask, TaskStatus
@@ -37,8 +38,10 @@ async def create_task(
     current_user: User = Depends(get_current_user),
 ):
     if current_user.is_director:
-        task = await add_task(data_task, type_task, session)
-        return task
+        new_task = await add_task(data_task, type_task, session)
+        task = await get_task_by_id(new_task.id, session)
+        send_email_confirmation_code(task.contractor_email, task)
+        return new_task
     else:
         return {"message": "У пользователя нет прав доступа"}
 
@@ -66,7 +69,7 @@ async def view_task(
     task_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
-) -> List[SMyTask]:
+) -> SMyTask:
     task = await get_task_by_id(task_id, session)
     return task
 
