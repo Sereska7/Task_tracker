@@ -23,6 +23,19 @@ class SUserLog(BaseModel):
     password: str
 
 
+class SUserLogForm(BaseModel):
+    email: str
+    password: str
+
+    @classmethod
+    def as_form(
+        cls,
+        email: str = Form(...),
+        password: str = Form(...)
+    ):
+        return cls(email=email, password=password)
+
+
 class SUserCreateForm(BaseModel):
     name: str
     email: str

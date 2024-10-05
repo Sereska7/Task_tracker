@@ -19,6 +19,7 @@ from application.core.schemas.user import (
     SUser,
     SUserCreate,
     SUserCreateForm,
+    SUserLogForm,
 )
 from application.crud.users import add_user, get_user
 from application.utils.auth_user import create_access_token
@@ -52,10 +53,16 @@ async def register_user(
         }
 
         response.set_cookie(
-            key="user_data", value=json.dumps(data), httponly=True, path="/", samesite="Lax",
-            secure=False
+            key="user_data",
+            value=json.dumps(data),
+            httponly=True,
+            path="/",
+            samesite="Lax",
+            secure=False,
         )
-        return RedirectResponse(url="/pages/verify", status_code=303, headers=dict(response.headers))
+        return RedirectResponse(
+            url="/pages/verify", status_code=303, headers=dict(response.headers)
+        )
     else:
         return {"status": "Пользователь с таким e-mail уже существует"}
 
@@ -72,7 +79,8 @@ async def verify_register(
 
     # Отладка чтения cookies
     print(f"Cookies получены: {user_data_cookie}")
-
+    response = RedirectResponse(url="/pages/base", status_code=303)
+    response.delete_cookie("user_data", httponly=True)
     if not user_data_cookie:
         return JSONResponse(
             status_code=400, content={"message": "Данные пользователя не найдены"}
@@ -87,9 +95,22 @@ async def verify_register(
             password=user_data["password"],
             session=session,
         )
-        response.delete_cookie("user_data", httponly=True)
+        # Аутентифицируем пользователя по email и паролю
+        current_user = await authenticate_user(
+            user_data["email"], user_data["password"], session
+        )
+        # Создаем JWT-токен с информацией о пользователе
+        access_token = create_access_token(
+            {"sub": str(current_user.id), "admin": str(current_user.is_director)}
+        )
+        # Устанавливаем токен в cookies, делая его доступным только через HTTP
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+        )
         del verification_codes[user_data["email"]]
-        return user
+        return response
     else:
         return JSONResponse(
             status_code=400, content={"message": "Код подтверждения неверен"}
@@ -99,7 +120,7 @@ async def verify_register(
 @router.post("/login")
 async def login_user(
     response: Response,
-    user_data: SUserLog,
+    user_data: Annotated[SUserLogForm, Depends(SUserLogForm.as_form)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ):
     """
@@ -118,10 +139,16 @@ async def login_user(
         )
 
         # Устанавливаем токен в cookies, делая его доступным только через HTTP
-        response.set_cookie("access_token", access_token, httponly=True)
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+        )
 
         # Возвращаем сообщение о статусе авторизации
-        return {"status": "Пользователь авторизован"}
+        return RedirectResponse(
+            url="/pages/base", status_code=303, headers=dict(response.headers)
+        )
 
         # Обрабатываем случай, когда пользователь не найден
     except UserNotFound:
@@ -140,7 +167,8 @@ async def logout_user(response: Response) -> dict:
     """
 
     # Удаляем cookie с токеном, чтобы деавторизовать пользователя
-    response.delete_cookie("access_token")
+    response = RedirectResponse(url="/pages/base", status_code=303)
+    response.delete_cookie("access_token", httponly=True)
 
     # Возвращаем сообщение о статусе деавторизации
-    return {"status": "Пользователь деавторизован"}
+    return response

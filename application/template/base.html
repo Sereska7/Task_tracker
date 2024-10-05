@@ -6,27 +6,37 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}Мои проекты{% endblock %}</title>
     {% block head %}{% endblock %}
-    <title>Мои проекты</title>
 </head>
 <body class="bg-gray-100">
     <!-- Навигация -->
     <nav class="bg-white shadow-lg py-4">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center">
-                <a href="#" class="text-3xl font-bold text-gray-800">
-                    Мои Проекты
+                <a href="/project/get" class="text-3xl font-bold text-gray-800">
+                    Проекты
                 </a>
                 <div class="flex items-center gap-6">
-                    <a href="#" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                    <a href="/pages/base" class="text-lg text-gray-600 hover:text-gray-800 transition">
                         Главная
                     </a>
-                    <a href="#" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                    <a href="/user/my_profile" class="text-lg text-gray-600 hover:text-gray-800 transition">
                         Профиль
                     </a>
-                    <a href="#" class="text-lg text-red-500 hover:text-red-700 transition">
-                        Выйти
+                    <a href="/task/my_tasks" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                        Мои задачи
                     </a>
+                    <!-- Проверка на наличие access_token -->
+                    {% if request.cookies.get('access_token') %}
+                        <a href="/pages/logout" class="text-lg text-red-500 hover:text-red-700 transition">
+                            Выйти
+                        </a>
+                    {% else %}
+                        <a href="/pages/login" class="text-lg text-green-500 hover:text-green-700 transition">
+                            Войти
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -35,10 +45,7 @@
     <!-- Контент -->
     <main class="container mx-auto px-4 py-10">
         <div class="bg-white p-6 rounded-lg shadow-lg">
-            {% block content %}
-            <h1 class="text-2xl font-bold mb-4">Добро пожаловать!</h1>
-            <p>Здесь будет контент страницы</p>
-            {% endblock %}
+            {% block content %}{% endblock %}
         </div>
     </main>
 

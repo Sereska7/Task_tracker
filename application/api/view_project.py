@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.core.models import User
@@ -13,6 +13,7 @@ from application.crud.projects import (
     get_all_projects,
     del_project,
 )
+from application.pages.router import templates
 from application.utils.dependencies import get_current_user
 
 router = APIRouter(tags=["Project"], prefix="/project")
@@ -51,11 +52,12 @@ async def change_project(
 
 @router.get("/get")
 async def get_projects(
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ) -> List[SProject] | dict:
     projects = await get_all_projects(session)
-    return projects
+    return templates.TemplateResponse("project.html", {"request": request, "projects": projects})
 
 
 @router.delete("/delete")

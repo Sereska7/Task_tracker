@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import HTTPException, Depends, Request
 from jose import jwt, ExpiredSignatureError, JWTError
@@ -43,52 +43,38 @@ async def authenticate_user(
     return user
 
 
-def get_token(request: Request):
-    """Извлечение токена из cookies запроса."""
-
-    # Извлечение токена из cookies с ключом "access_token"
+async def get_token_from_request(request: Request) -> Optional[str]:
+    """
+    Функция для получения JWT-токена из запроса. Токен может быть необязательным.
+    """
     token = request.cookies.get("access_token")
-
-    # Если токен отсутствует, выбрасываем исключение с кодом 404
     if not token:
-        raise HTTPException(status_code=404, detail="Пользователь не аутентифицирован")
-
-    # Возвращаем извлеченный токен
-    return token
+        token = request.headers.get("Authorization")
+        if token and token.startswith("Bearer "):
+            token = token[7:]
+    return token  # Если токен не найден, возвращаем None
 
 
 async def get_current_user(
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    token: str = Depends(get_token),
+        request: Request,
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        token: Optional[str] = Depends(get_token_from_request)
 ):
-    """
-    Получает текущего пользователя по JWT-токену.
+    # Если токен отсутствует, пользователь не авторизован
+    if not token:
+        return None  # Вернем None для неавторизованных пользователей
 
-    Декодирует токен, проверяет его валидность и извлекает ID пользователя.
-    Если токен недействителен или пользователь не найден, выбрасывает HTTPException.
-    """
     try:
-        # Декодируем токен с использованием секретного ключа и алгоритма
-        payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
-
-        # Обработка случаев, когда токен не найден
-    except TokenNotFound:
-        raise HTTPException(status_code=404, detail="Токен пользователя не найден")
-
-        # Обработка случаев, когда срок действия токена истек
-    except ExpiredSignatureError:
-        raise HTTPException(status_code=500, detail="Срок действия токена истек.")
-
-        # Обработка других ошибок при работе с JWT
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     except JWTError:
-        raise HTTPException(status_code=401, detail="Произошла непредвиденная ошибка.")
+        raise HTTPException(status_code=401, detail="Ошибка проверки токена.")
 
-        # Извлекаем идентификатор пользователя из payload и ищем пользователя в базе данных
-    user = await get_user(session, id=int(payload.get("sub")))
+    user_id = payload.get("sub")
+    if user_id is None:
+        raise HTTPException(status_code=401, detail="Некорректный токен.")
 
-    # Если пользователь не найден, возвращаем ошибку 404
+    user = await get_user(session, id=int(user_id))
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден.")
 
-    # Возвращаем объект пользователя
     return user
