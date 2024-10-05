@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Выход</title>
+</head>
+<body class="bg-gray-100">
+    <div class="flex justify-center items-center h-screen">
+        <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-6 text-center">Выход</h1>
+            <form method="post" action="/logout">
+                <p>Вы уверены, что хотите выйти?</p>
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded mt-4">Выйти</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

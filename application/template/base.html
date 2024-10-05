@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block head %}{% endblock %}
+    <title>Мои проекты</title>
+</head>
+<body class="bg-gray-100">
+    <!-- Навигация -->
+    <nav class="bg-white shadow-lg py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-3xl font-bold text-gray-800">
+                    Мои Проекты
+                </a>
+                <div class="flex items-center gap-6">
+                    <a href="#" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                        Главная
+                    </a>
+                    <a href="#" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                        Профиль
+                    </a>
+                    <a href="#" class="text-lg text-red-500 hover:text-red-700 transition">
+                        Выйти
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Контент -->
+    <main class="container mx-auto px-4 py-10">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            {% block content %}
+            <h1 class="text-2xl font-bold mb-4">Добро пожаловать!</h1>
+            <p>Здесь будет контент страницы</p>
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Футер -->
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4">
+            <p class="text-center">
+                © 2024 Ваши Проекты. Все права защищены.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

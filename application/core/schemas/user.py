@@ -1,6 +1,5 @@
-from typing import List
-
 from pydantic import BaseModel, EmailStr
+from fastapi import Form
 
 from application.core.models.user import PositionType
 
@@ -9,6 +8,7 @@ class SUserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+    position: PositionType
 
 
 class SUser(BaseModel):
@@ -21,3 +21,20 @@ class SUser(BaseModel):
 class SUserLog(BaseModel):
     email: EmailStr
     password: str
+
+
+class SUserCreateForm(BaseModel):
+    name: str
+    email: str
+    password: str
+    position: PositionType
+
+    @classmethod
+    def as_form(
+        cls,
+        name: str = Form(...),
+        email: str = Form(...),
+        password: str = Form(...),
+        position: PositionType = Form(...)
+    ):
+        return cls(name=name, email=email, password=password, position=position)
