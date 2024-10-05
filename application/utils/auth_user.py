@@ -27,7 +27,6 @@ def create_access_token(data: dict) -> str:
     """
     # Создаем копию переданных данных для кодирования
     to_encode = data.copy()
-    print(to_encode)
 
     # Кодируем данные в JWT токен, используя секретный ключ и алгоритм
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, settings.ALGORITHM)

@@ -3,7 +3,11 @@ from typing import Annotated, List, Dict
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.background_tasks.send_message import send_email_confirmation_code
+from application.background_tasks.send_message import (
+    send_email_add_new_task_for_you,
+    send_email_change_task_for_you,
+    send_email_accept_task,
+)
 from application.core.models import User
 from application.core.models.db_helper import db_helper
 from application.core.models.task import TypeTask, TaskStatus
@@ -26,6 +30,7 @@ from application.crud.tasks import (
     get_tasks_by_project,
 )
 from application.utils.dependencies import get_current_user
+from application.utils.detected import detect_changes
 
 router = APIRouter(tags=["Task"], prefix="/task")
 
@@ -40,7 +45,7 @@ async def create_task(
     if current_user.is_director:
         new_task = await add_task(data_task, type_task, session)
         task = await get_task_by_id(new_task.id, session)
-        send_email_confirmation_code(task.contractor_email, task)
+        send_email_add_new_task_for_you(task.contractor_email, task)
         return new_task
     else:
         return {"message": "У пользователя нет прав доступа"}
@@ -96,6 +101,8 @@ async def accepted_task(
         up_task = await change_status_task(
             task_id, current_user.id, session, status=task_status
         )
+        task = await get_task_by_id(up_task.id, session)
+        send_email_accept_task(task.contractor_email, task)
         return up_task
 
 
@@ -107,7 +114,13 @@ async def change_task(
     current_user: User = Depends(get_current_user),
 ) -> SBaseTask | dict:
     if current_user.is_director:
+        current_task = await get_task_by_id(task_id, session)
+        changed_fields = detect_changes(current_task, data_task)
         up_task = await update_task(task_id, data_task, session)
+        if changed_fields:
+            send_email_change_task_for_you(
+                current_task.contractor_email, changed_fields
+            )
         return up_task
     else:
         return {"message": "У пользователя нет прав доступа"}

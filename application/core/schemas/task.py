@@ -18,7 +18,6 @@ class SChangeTask(BaseModel):
     description: str
     date_from: date
     date_to: date
-    contractor: int
 
 
 class STask(BaseModel):

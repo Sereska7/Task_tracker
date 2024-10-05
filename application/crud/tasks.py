@@ -111,6 +111,7 @@ async def update_task(task_id: int, data_task: SChangeTask, session: AsyncSessio
         .returning(Task)
     )
     up_task = await session.execute(stmt)
+    await session.commit()
     return up_task.scalar()
 
 
