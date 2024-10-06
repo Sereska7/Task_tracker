@@ -19,8 +19,12 @@ router = APIRouter(tags=["User"], prefix="/user")
 @router.get("/my_profile")
 async def get_profile(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> SUser:
     """
     Получение профиля текущего пользователя:
@@ -40,8 +44,12 @@ async def get_profile(
 @router.get("/all")
 async def get_all_users(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ):
     """
     Получение списка всех пользователей:
@@ -59,4 +67,3 @@ async def get_all_users(
     else:
         # Если у пользователя нет прав директора, возвращаем сообщение об отказе в доступе
         return {"message": "У вас нет прав для доступа"}
-

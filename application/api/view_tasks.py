@@ -13,7 +13,6 @@ from application.core.models.db_helper import db_helper
 from application.core.models.task import TypeTask, TaskStatus
 from application.core.schemas.task import (
     STask,
-    ReadTask,
     SChangeTask,
     SBaseTask,
     SMyTask,
@@ -35,7 +34,7 @@ from application.crud.users import get_users
 from application.pages.router_base import templates
 from application.pages.router_admin import templates_admin as templates_admin
 from application.utils.dependencies import get_current_user
-from application.utils.detected import detect_changes
+from application.utils.detected_change_task import detect_changes
 
 # Маршрутизатор для управления задачами
 router = APIRouter(tags=["Task"], prefix="/task")
@@ -45,9 +44,15 @@ router = APIRouter(tags=["Task"], prefix="/task")
 @router.post("/create")
 async def create_task(
     request: Request,  # Объект запроса
-    task_data: Annotated[STaskCreateForm, Depends(STaskCreateForm.as_form)],  # Форма создания задачи
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    task_data: Annotated[
+        STaskCreateForm, Depends(STaskCreateForm.as_form)
+    ],  # Форма создания задачи
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ):
     """
     Создание новой задачи:
@@ -88,8 +93,12 @@ async def create_task(
 @router.get("/get_all")
 async def get_tasks(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> List[SBaseTask]:
     """
     Получение всех задач:
@@ -106,8 +115,12 @@ async def get_tasks(
 @router.get("/my_tasks")
 async def view_my_tasks(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> List[SMyTask]:
     """
     Просмотр задач текущего пользователя:
@@ -125,8 +138,12 @@ async def view_my_tasks(
 async def view_task(
     task_id: int,  # Идентификатор задачи
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> SMyTask:
     """
     Просмотр конкретной задачи по ID:
@@ -143,8 +160,12 @@ async def view_task(
 async def view_task_by_project(
     project_id: int,  # Идентификатор проекта
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> List[SBaseTask]:
     """
     Просмотр задач по проекту:
@@ -160,8 +181,12 @@ async def view_task_by_project(
 @router.post("/accepted_for_work")
 async def accepted_task(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ):
     """
     Принятие задачи в работу:
@@ -190,8 +215,12 @@ async def accepted_task(
 async def change_task(
     task_id: int,  # Идентификатор задачи
     data_task: SChangeTask,  # Данные для изменения задачи
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
-    current_user: User = Depends(get_current_user),  # Текущий авторизованный пользователь
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
+    current_user: User = Depends(
+        get_current_user
+    ),  # Текущий авторизованный пользователь
 ) -> SBaseTask | dict:
     """
     Изменение существующей задачи:
@@ -215,7 +244,9 @@ async def change_task(
 @router.post("/delete")
 async def del_task(
     request: Request,  # Объект запроса
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],  # Сессия базы данных
+    session: Annotated[
+        AsyncSession, Depends(db_helper.session_getter)
+    ],  # Сессия базы данных
     task_id: int = Form(...),  # Идентификатор задачи для удаления
 ):
     """
@@ -234,4 +265,3 @@ async def del_task(
         "task_admin.html",
         {"request": request, "tasks": tasks, "message": "Задача была успешно удалена"},
     )
-

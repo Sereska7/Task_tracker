@@ -24,7 +24,7 @@ from application.core.schemas.user import (
 from application.crud.users import add_user, get_user
 from application.utils.auth_user import create_access_token
 from application.utils.dependencies import authenticate_user
-from application.utils.util_verification_code import (
+from application.utils.verification_code import (
     verification_codes,
     remove_code_after_delay,
 )
@@ -107,7 +107,6 @@ async def register_user(
 @router.post("/verify")
 async def verify_register(
     request: Request,  # Запрос для получения cookies
-    response: Response,  # Ответ для удаления cookies
     session: Annotated[
         AsyncSession, Depends(db_helper.session_getter)
     ],  # Получение сессии БД
@@ -186,7 +185,6 @@ async def verify_register(
 # Вход пользователя
 @router.post("/login")
 async def login_user(
-    response: Response,  # Ответ для задания cookies
     user_data: Annotated[
         SUserLogForm, Depends(SUserLogForm.as_form)
     ],  # Зависимость формы для получения данных
