@@ -11,6 +11,7 @@ from application.core.exception.user_exception import (
     InvalidPasswordError,
     UserNotFound,
 )
+from application.core.models import User
 from application.core.models.db_helper import db_helper
 from application.crud.users import get_user
 from application.utils.auth_user import verify_password
@@ -20,7 +21,7 @@ async def authenticate_user(
     email: EmailStr,
     password: str,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-) -> User:
+):
     """
     Аутентификация пользователя.
 

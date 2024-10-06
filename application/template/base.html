@@ -33,9 +33,14 @@
                             Выйти
                         </a>
                     {% else %}
-                        <a href="/pages/login" class="text-lg text-green-500 hover:text-green-700 transition">
-                            Войти
-                        </a>
+                        <div class="flex gap-4">
+                            <a href="/pages/login" class="text-lg text-green-500 hover:text-green-700 transition">
+                                Войти
+                            </a>
+                            <a href="/pages/register" class="text-lg text-blue-500 hover:text-blue-700 transition">
+                                Регистрация
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -43,15 +48,15 @@
     </nav>
 
     <!-- Контент -->
-<main class="container mx-auto px-4 py-10">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl font-semibold mb-4">Тестовая демонстрация</h2>
-        <p class="mb-6 text-gray-600">
-            Это демонстрационная версия страницы. Здесь вы можете увидеть пример реализации веб-приложения.
-        </p>
-        {% block content %}{% endblock %}
-    </div>
-</main>
+    <main class="container mx-auto px-4 py-10">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Тестовая демонстрация</h2>
+            <p class="mb-6 text-gray-600">
+                Это демонстрационная версия страницы. Здесь вы можете увидеть пример реализации веб-приложения.
+            </p>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
 
     <!-- Футер -->
     <footer class="bg-gray-800 text-white py-4">

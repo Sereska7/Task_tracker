@@ -13,7 +13,7 @@ from application.utils.create_message_for_email import (
 )
 
 # Инициализация объекта Celery с брокером Redis
-celery = Celery("task", broker="redis://localhost:6379")
+celery = Celery("task", broker=settings.REDIS_URL)
 
 
 # Задача Celery для отправки email с кодом подтверждения

@@ -15,7 +15,7 @@ from application.utils.dependencies import get_current_user
 router = APIRouter(tags=["Admin"], prefix="/admin")
 
 # Шаблоны для административных страниц
-templates_admin = Jinja2Templates(directory="template/admin")
+templates_admin = Jinja2Templates(directory="application/template/admin")
 
 
 # Страница создания новой задачи

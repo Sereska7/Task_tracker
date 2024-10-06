@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     # Параметры подключения к базе данных
     DB_URL: str  # URL для подключения к базе данных
 
+    TEST_DB_URL: str
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+
+    REDIS_URL: str
+
     # Параметры пула соединений базы данных
     db_echo: bool = False  # Логирование SQL-запросов
     db_echo_pool: bool = False  # Логирование действий с пулом соединений
@@ -34,9 +42,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int  # Порт SMTP-сервера
 
     # Конфигурация модели Pydantic для загрузки переменных окружения
-    model_config = {
-        "env_file": ".env"  # Путь к файлу окружения
-    }
+    model_config = {"env_file": ".env"}  # Путь к файлу окружения
 
 
 # Создание объекта настроек приложения
