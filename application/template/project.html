@@ -15,10 +15,18 @@
                             {{ project.name }}
                         </a>
                         <p class="text-sm text-gray-600">{{ project.description }}</p>
+
+                        <!-- Кнопка для перехода к задачам проекта -->
+                        <div class="mt-4">
+                            <a href="/task/by_project?project_id={{ project.id }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                                Задачи проекта
+                            </a>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
+            <p>Пока нет доступных проектов.</p>
         {% endif %}
     </div>
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Задача принята в работу
+{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">Задача принята в работу!</h1>
+        <p><strong>Название задачи:</strong> {{ task.title }}</p>
+        <p><strong>Описание задачи:</strong> {{ task.description }}</p>
+        <p><strong>Дата начала:</strong> {{ task.date_from }}</p>
+        <p><strong>Дата завершения:</strong> {{ task.date_to }}</p>
+        <p><strong>Ответственный:</strong> {{ user.name }}</p>
+
+        <div class="mt-4">
+            <p class="text-lg font-semibold text-green-500">Задачу нужно завершить до: {{ task.date_to }}</p>
+        </div>
+
+        <div class="mt-6">
+            <a href="/task/my_tasks" class="text-blue-500 hover:text-blue-700">
+                Вернуться к списку задач
+            </a>
+        </div>
+    </div>
+{% endblock %}

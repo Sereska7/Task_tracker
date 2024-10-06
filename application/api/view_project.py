@@ -1,11 +1,11 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.core.models import User
 from application.core.models.db_helper import db_helper
-from application.core.schemas.project import SProject
+from application.core.schemas.project import SProject, SProjectCreateForm
 from application.crud.projects import (
     add_project,
     get_project,
@@ -13,7 +13,8 @@ from application.crud.projects import (
     get_all_projects,
     del_project,
 )
-from application.pages.router import templates
+from application.pages.router_base import templates
+from application.pages.router_admin import templates_admin as templates_admit
 from application.utils.dependencies import get_current_user
 
 router = APIRouter(tags=["Project"], prefix="/project")
@@ -21,13 +22,17 @@ router = APIRouter(tags=["Project"], prefix="/project")
 
 @router.post("/create")
 async def create_project(
-    data_project: SProject,
+    request: Request,
+    data_project: Annotated[SProjectCreateForm, Depends(SProjectCreateForm.as_form)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
-) -> SProject | dict:
+):
     if current_user.is_director:
         project = await add_project(data_project, session)
-        return project
+        projects = await get_all_projects(session)
+        return templates_admit.TemplateResponse(
+            "project_admin.html", {"request": request, "projects": projects, "message": "Проект успешно создан."}
+        )
     else:
         return {"message": "У пользователя нет прав доступа"}
 
@@ -57,20 +62,33 @@ async def get_projects(
     current_user: User = Depends(get_current_user),
 ) -> List[SProject] | dict:
     projects = await get_all_projects(session)
-    return templates.TemplateResponse("project.html", {"request": request, "projects": projects})
+    if current_user.is_director:
+        return templates_admit.TemplateResponse(
+            "project_admin.html", {"request": request, "projects": projects}
+        )
+    else:
+        return templates.TemplateResponse(
+            "project.html", {"request": request, "projects": projects}
+        )
 
 
-@router.delete("/delete")
+@router.post("/delete")
 async def delete_project(
-    project_id: int,
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
+    project_id: int = Form(...),
 ) -> dict:
     if current_user.is_director:
-        return {"message": "У пользователя нет прав доступа"}
-    project = await get_project(session, id=project_id)
-    if not project:
-        return {"message": "Нет такого проекта"}
+        project = await del_project(project_id, session)
+        projects = await get_all_projects(session)
+        return templates_admit.TemplateResponse(
+            "project_admin.html",
+            {
+                "request": request,
+                "projects": projects,
+                "message": "Проект успешно удален",
+            },
+        )
     else:
-        await del_project(project_id, session)
-        return {"message": "successful"}
+        return {"message": "У пользователя нет прав доступа"}

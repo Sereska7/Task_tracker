@@ -14,8 +14,8 @@ from application.core.schemas.task import (
 )
 
 
-async def add_task(data_task: STask, type_task: TypeTask, session: AsyncSession):
-    task = Task(type_task=type_task, **data_task.model_dump())
+async def add_task(data_task: SBaseTask, session: AsyncSession):
+    task = Task(**data_task.model_dump())
     session.add(task)
     await session.commit()
     return task
@@ -42,7 +42,7 @@ async def get_tasks_by_project(project_id: int, session: AsyncSession):
 async def get_task_by_id(
     task_id: int,
     session: AsyncSession,
-) -> SMyTask:
+):
     stmt = (
         select(
             User.email.label("contractor_email"),
@@ -52,6 +52,7 @@ async def get_task_by_id(
             Task.description,
             Task.date_from,
             Task.date_to,
+            Task.type_task,
             Task.status,
         )
         .join(User, Task.contractor == User.id)
@@ -100,6 +101,7 @@ async def change_status_task(
         .returning(Task)
     )
     up_task = await session.execute(stmt)
+    await session.commit()
     return up_task.scalar()
 
 
@@ -118,3 +120,4 @@ async def update_task(task_id: int, data_task: SChangeTask, session: AsyncSessio
 async def remove_task(task_id: int, session: AsyncSession):
     stmt = delete(Task).where(Task.id == task_id)
     await session.execute(stmt)
+    await session.commit()

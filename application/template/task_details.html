@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Детали задачи
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Детали задачи</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-lg font-semibold">Название задачи: {{ task.name }}</h2>
+        <p class="text-gray-600"><strong>Проект:</strong> {{ task.project_name }}</p>
+        <p class="text-gray-600"><strong>Описание:</strong> {{ task.description }}</p>
+        <p class="text-gray-600"><strong>Email исполнителя:</strong> {{ task.contractor_email }}</p>
+        <p class="text-gray-600"><strong>Дата начала:</strong> {{ task.date_from }}</p>
+        <p class="text-gray-600"><strong>Дата завершения:</strong> {{ task.date_to }}</p>
+        <p class="text-gray-600"><strong>Статус:</strong> {{ task.status.value }}</p>
+
+        <div class="mt-4">
+            <a href="/task/my_tasks" class="text-blue-500 hover:text-blue-700">
+                Назад к задачам
+            </a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+    Создать проект
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Создать проект</h1>
+
+    <!-- Форма создания проекта -->
+    <form method="post" action="/project/create">
+        <!-- Название проекта -->
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700 font-bold mb-2">Название проекта</label>
+            <input type="text" id="name" name="name" class="w-full border border-gray-300 rounded px-4 py-2" required>
+        </div>
+
+        <!-- Описание проекта -->
+        <div class="mb-4">
+            <label for="description" class="block text-gray-700 font-bold mb-2">Описание проекта</label>
+            <textarea id="description" name="description" rows="4" class="w-full border border-gray-300 rounded px-4 py-2" required></textarea>
+        </div>
+
+        <!-- Кнопка отправки -->
+        <div class="mb-6">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                Создать проект
+            </button>
+        </div>
+    </form>
+{% endblock %}

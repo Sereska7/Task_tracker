@@ -1,6 +1,6 @@
 from typing import Annotated, List, Dict
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, HTTPException, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.background_tasks.send_message import (
@@ -17,7 +17,9 @@ from application.core.schemas.task import (
     SChangeTask,
     SBaseTask,
     SMyTask,
+    STaskCreateForm,
 )
+from application.crud.projects import get_all_projects
 from application.crud.tasks import (
     add_task,
     get_all_tasks,
@@ -29,6 +31,9 @@ from application.crud.tasks import (
     remove_task,
     get_tasks_by_project,
 )
+from application.crud.users import get_users
+from application.pages.router_base import templates
+from application.pages.router_admin import templates_admin as templates_admin
 from application.utils.dependencies import get_current_user
 from application.utils.detected import detect_changes
 
@@ -37,73 +42,113 @@ router = APIRouter(tags=["Task"], prefix="/task")
 
 @router.post("/create")
 async def create_task(
-    type_task: TypeTask,
-    data_task: STask,
+    request: Request,
+    task_data: Annotated[STaskCreateForm, Depends(STaskCreateForm.as_form)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ):
     if current_user.is_director:
-        new_task = await add_task(data_task, type_task, session)
+        new_task = await add_task(task_data, session)
         task = await get_task_by_id(new_task.id, session)
+
+        # Списки проектов и пользователей для повторной загрузки формы
+        projects = await get_all_projects(session)
+        users = await get_users(session)
+
+        # Отправка email с информацией о задаче
         send_email_add_new_task_for_you(task.contractor_email, task)
-        return new_task
+
+        # Возврат шаблона с подтверждением
+        return templates_admin.TemplateResponse(
+            "new_task.html", {"request": request, "task": task}
+        )
     else:
-        return {"message": "У пользователя нет прав доступа"}
+        projects = await get_all_projects(session)
+        users = await get_users(session)
+        return templates_admin.TemplateResponse(
+            "create_task_admin.html",
+            {
+                "request": request,
+                "message": "У вас нет прав для создания задач",
+                "projects": projects,
+                "users": users,
+            },
+        )
 
 
 @router.get("/get_all")
 async def get_tasks(
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ) -> List[SBaseTask]:
-    return await get_all_tasks(session)
+    tasks = await get_all_tasks(session)
+    if current_user.is_director:
+        return templates_admin.TemplateResponse(
+            "task_admin.html", {"request": request, "tasks": tasks}
+        )
 
 
 @router.get("/my_tasks")
 async def view_my_tasks(
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ) -> List[SMyTask]:
     user_id = current_user.id
-    task = await get_my_tasks(user_id, session)
-    return task
+    tasks = await get_my_tasks(user_id, session)
+    return templates.TemplateResponse(
+        "my_tasks.html", {"request": request, "tasks": tasks}
+    )
 
 
 @router.get("/get_task")
 async def view_task(
     task_id: int,
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ) -> SMyTask:
     task = await get_task_by_id(task_id, session)
-    return task
+    return templates.TemplateResponse(
+        "task_details.html", {"request": request, "task": task}
+    )
 
 
 @router.get("/by_project")
 async def view_task_by_project(
     project_id: int,
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ) -> List[SBaseTask]:
     tasks = await get_tasks_by_project(project_id, session)
-    return tasks
+    return templates.TemplateResponse(
+        "task_by_project.html", {"request": request, "tasks": tasks}
+    )
 
 
-@router.patch("/accepted_for_work")
+@router.post("/accepted_for_work")
 async def accepted_task(
-    task_id: int,
-    task_status: TaskStatus,
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: User = Depends(get_current_user),
 ):
+    form_data = await request.form()
+    task_id = int(form_data.get("task_id"))  # Приведение к целому числу
+
     task = await get_task(session, id=task_id)
     if task.contractor == current_user.id:
         up_task = await change_status_task(
-            task_id, current_user.id, session, status=task_status
+            task_id, current_user.id, session, status=TaskStatus.IN_PROGRESS
         )
         task = await get_task_by_id(up_task.id, session)
         send_email_accept_task(task.contractor_email, task)
-        return up_task
+        tasks = await get_my_tasks(current_user.id, session)
+        return templates.TemplateResponse(
+            "my_tasks.html", {"request": request, "tasks": tasks}
+        )
+    return {"message": "Вы не являетесь исполнителем этой задачи"}
 
 
 @router.patch("/change")
@@ -126,18 +171,20 @@ async def change_task(
         return {"message": "У пользователя нет прав доступа"}
 
 
-@router.delete("/delete")
+@router.post("/delete")
 async def del_task(
-    task_id: int,
+    request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    current_user: User = Depends(get_current_user),
+    task_id: int = Form(...),
 ):
-    if current_user.is_director:
-        task = await get_task(session, id=task_id)
-        if not task:
-            return {"message": "Задача не найдена"}
-        else:
-            await remove_task(task_id, session)
-            return {"message": "Задача удалена"}
-    else:
-        return {"message": "У пользователя нет прав доступа"}
+    task = await get_task_by_id(task_id, session)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    await remove_task(task_id, session)
+    tasks = await get_all_tasks(session)
+    # После удаления возвращаем шаблон с сообщением об успехе
+    return templates_admin.TemplateResponse(
+        "task_admin.html",
+        {"request": request, "tasks": tasks, "message": "Задача была успешно удалена"},
+    )

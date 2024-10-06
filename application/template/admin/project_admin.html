@@ -1,0 +1,59 @@
+{% extends "base_admin.html" %}
+
+{% block head %}
+    <title>Проекты</title>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Проекты</h1>
+
+    <!-- Отображение сообщения -->
+    {% if message %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <span>{{ message }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Кнопка создания проекта -->
+    <div class="flex justify-between mb-6">
+        <a href="/admin/create_project" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+            Создать проект
+        </a>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        {% if projects %}
+            <ul>
+                {% for project in projects %}
+                    <li class="mb-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <a href="/project/{{ project.id }}" class="text-lg text-blue-600 hover:text-blue-800 transition">
+                                    {{ project.name }}
+                                </a>
+                                <p class="text-sm text-gray-600">{{ project.description }}</p>
+
+                                <!-- Кнопка для перехода к задачам проекта -->
+                                <div class="mt-4">
+                                    <a href="/task/by_project?project_id={{ project.id }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                                        Задачи проекта
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Кнопка удаления проекта -->
+                            <form method="post" action="/project/delete" class="ml-4">
+                                <input type="hidden" name="project_id" value="{{ project.id }}">
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+                                    Удалить проект
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Пока нет доступных проектов.</p>
+        {% endif %}
+    </div>
+{% endblock %}

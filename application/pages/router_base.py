@@ -1,10 +1,9 @@
 from typing import Optional
 
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 
-from application.api.view_auth import register_user
 from application.core.models import User
 from application.utils.dependencies import get_current_user
 
@@ -14,9 +13,20 @@ templates = Jinja2Templates(directory="template")
 
 
 @router.get("/base", response_class=HTMLResponse)
-async def base_page(request: Request, current_user: Optional[User] = Depends(get_current_user)):
-    # Если пользователь не авторизован, current_user будет None
-    return templates.TemplateResponse("base.html", {"request": request, "user": current_user})
+async def base_page(
+    request: Request, current_user: Optional[User] = Depends(get_current_user)
+):
+    if current_user is None:
+        return RedirectResponse(url="/pages/login", status_code=303)
+
+    if current_user.is_director:
+        template = "admin/base_admin.html"
+    else:
+        template = "base.html"
+    # Возвращаем шаблон с необходимыми данными
+    return templates.TemplateResponse(
+        template, {"request": request, "user": current_user}
+    )
 
 
 @router.get("/register", response_class=HTMLResponse)

@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>{% block title %}Мои проекты{% endblock %}</title>
+    <title>{% block title %}Проекты{% endblock %}</title>
     {% block head %}{% endblock %}
 </head>
 <body class="bg-gray-100">
@@ -21,11 +21,11 @@
                     <a href="/pages/base" class="text-lg text-gray-600 hover:text-gray-800 transition">
                         Главная
                     </a>
-                    <a href="/user/my_profile" class="text-lg text-gray-600 hover:text-gray-800 transition">
-                        Профиль
+                    <a href="/task/get_all" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                        Задачи
                     </a>
-                    <a href="/task/my_tasks" class="text-lg text-gray-600 hover:text-gray-800 transition">
-                        Мои задачи
+                    <a href="/user/all" class="text-lg text-gray-600 hover:text-gray-800 transition">
+                        Сотрудники
                     </a>
                     <!-- Проверка на наличие access_token -->
                     {% if request.cookies.get('access_token') %}
@@ -43,21 +43,21 @@
     </nav>
 
     <!-- Контент -->
-<main class="container mx-auto px-4 py-10">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl font-semibold mb-4">Тестовая демонстрация</h2>
-        <p class="mb-6 text-gray-600">
-            Это демонстрационная версия страницы. Здесь вы можете увидеть пример реализации веб-приложения.
-        </p>
-        {% block content %}{% endblock %}
-    </div>
-</main>
+    <main class="container mx-auto px-4 py-10">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Добро пожаловать в Панель Управления Проектами</h2>
+            <p class="mb-6 text-gray-600">
+                Здесь вы можете управлять проектами и задачами.
+            </p>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
 
     <!-- Футер -->
     <footer class="bg-gray-800 text-white py-4">
         <div class="container mx-auto px-4">
             <p class="text-center">
-                © 2024 Ваши Проекты. Все права защищены.
+                © 2024 Панель Управления Проектами. Все права защищены.
             </p>
         </div>
     </footer>

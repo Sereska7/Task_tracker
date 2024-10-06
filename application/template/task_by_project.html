@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Задачи проекта
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Задачи проекта</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        {% if tasks %}
+            <ul class="divide-y divide-gray-200">
+                {% for task in tasks %}
+                    <li class="py-4">
+                        <h2 class="text-lg font-semibold">{{ task.name }}</h2>
+                        <p class="text-gray-600">{{ task.description }}</p>
+                        <p class="text-sm text-gray-500">Дата начала: {{ task.date_from }}</p>
+                        <p class="text-sm text-gray-500">Дата завершения: {{ task.date_to }}</p>
+
+                        <!-- Статус задачи -->
+                        <p class="text-sm mt-2">
+                            <strong>Статус:</strong> {{ task.status.value }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>В этом проекте нет задач.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+    Создать задачу
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Создать задачу</h1>
+
+    <!-- Сообщение -->
+    {% if message %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <span>{{ message }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Форма создания задачи -->
+    <form method="post" action="/task/create">
+        <!-- Название задачи -->
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700 font-bold mb-2">Название задачи</label>
+            <input type="text" id="name" name="name" class="w-full border border-gray-300 rounded px-4 py-2" required>
+        </div>
+
+        <!-- Проект -->
+        <div class="mb-4">
+            <label for="project_id" class="block text-gray-700 font-bold mb-2">Проект</label>
+            <select id="project_id" name="project_id" class="w-full border border-gray-300 rounded px-4 py-2">
+                {% for project in projects %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Описание задачи -->
+        <div class="mb-4">
+            <label for="description" class="block text-gray-700 font-bold mb-2">Описание задачи</label>
+            <textarea id="description" name="description" rows="4" class="w-full border border-gray-300 rounded px-4 py-2" required></textarea>
+        </div>
+
+        <!-- Дата начала -->
+        <div class="mb-4">
+            <label for="date_from" class="block text-gray-700 font-bold mb-2">Дата начала</label>
+            <input type="date" id="date_from" name="date_from" class="w-full border border-gray-300 rounded px-4 py-2" required>
+        </div>
+
+        <!-- Дата завершения -->
+        <div class="mb-4">
+            <label for="date_to" class="block text-gray-700 font-bold mb-2">Дата завершения</label>
+            <input type="date" id="date_to" name="date_to" class="w-full border border-gray-300 rounded px-4 py-2" required>
+        </div>
+
+        <!-- Назначенный пользователь (contractor) -->
+        <div class="mb-4">
+            <label for="contractor" class="block text-gray-700 font-bold mb-2">Ответственный</label>
+            <select id="contractor" name="contractor" class="w-full border border-gray-300 rounded px-4 py-2">
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.email }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Тип задачи -->
+        <div class="mb-4">
+            <label for="type_task" class="block text-gray-700 font-bold mb-2">Тип задачи</label>
+            <select id="type_task" name="type_task" class="w-full border border-gray-300 rounded px-4 py-2">
+                {% for type_name, type_value in type_task_options %}
+                    <option value="{{ type_value }}">{{ type_value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Статус задачи -->
+        <div class="mb-4">
+            <label for="status" class="block text-gray-700 font-bold mb-2">Статус</label>
+            <select id="status" name="status" class="w-full border border-gray-300 rounded px-4 py-2">
+                {% for status_name, status_value in task_status_options %}
+                    <option value="{{ status_value }}">{{ status_value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Кнопка отправки -->
+        <div class="mb-6">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                Создать задачу
+            </button>
+        </div>
+    </form>
+{% endblock %}

@@ -32,3 +32,9 @@ async def get_my_profile(user_id: int, session: AsyncSession):
     stmt = select(User).where(User.id == user_id)
     user = await session.execute(stmt)
     return user.scalar()
+
+
+async def get_users(session: AsyncSession):
+    stmt = select(User).where(User.is_director==False)
+    user = await session.execute(stmt)
+    return user.scalars().all()

@@ -1,0 +1,37 @@
+{% extends "base_admin.html" %}
+
+{% block head %}
+    <title>Пользователи</title>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-6">Все пользователи</h1>
+
+    <!-- Проверяем наличие пользователей -->
+    {% if users %}
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">ID</th>
+                        <th class="py-3 px-6 text-left">Имя</th>
+                        <th class="py-3 px-6 text-left">Email</th>
+                        <th class="py-3 px-6 text-left">Должность</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for user in users %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ user.id }}</td>
+                            <td class="py-3 px-6 text-left">{{ user.name }}</td>
+                            <td class="py-3 px-6 text-left">{{ user.email }}</td>
+                            <td class="py-3 px-6 text-left">{{ user.position.value }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Пользователей пока нет.</p>
+    {% endif %}
+{% endblock %}

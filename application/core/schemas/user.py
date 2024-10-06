@@ -18,6 +18,13 @@ class SUser(BaseModel):
     position: str
 
 
+class UserRead:
+    id: int
+    name: str
+    email: EmailStr
+    position: str
+
+
 class SUserLog(BaseModel):
     email: EmailStr
     password: str
