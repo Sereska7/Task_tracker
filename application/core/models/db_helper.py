@@ -53,9 +53,16 @@ class DatabaseHelper:
             yield session
 
 
+if settings.MODE == "TEST":
+    DB_URL = settings.TEST_DB_URL
+else:
+    DB_URL = settings.DB_URL
+
+print(f"DB_URL: {DB_URL}")
+
 # Создание экземпляра DatabaseHelper с настройками из переменных окружения
 db_helper = DatabaseHelper(
-    url=str(settings.DB_URL),
+    url=str(DB_URL),
     echo=settings.db_echo,
     echo_pool=settings.db_echo_pool,
     pool_size=settings.db_pool_size,

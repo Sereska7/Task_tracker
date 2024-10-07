@@ -1,7 +1,11 @@
+import os
+from typing import Literal
+
 import dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Загружаем переменные окружения из файла .env
+
+# Загружаем основной файл окружения
 dotenv.load_dotenv()
 
 
@@ -11,10 +15,10 @@ class Settings(BaseSettings):
     таких как параметры базы данных, настройки почтового сервера и секретные ключи.
     """
 
+    MODE: Literal["DEV", "TEST"]
     # Параметры подключения к базе данных
     DB_URL: str  # URL для подключения к базе данных
-
-    TEST_DB_URL: str
+    TEST_DB_URL: str  # URL для подключения в тестовой базе данных
 
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
@@ -41,9 +45,11 @@ class Settings(BaseSettings):
     SMTP_HOST: str  # Адрес SMTP-сервера
     SMTP_PORT: int  # Порт SMTP-сервера
 
-    # Конфигурация модели Pydantic для загрузки переменных окружения
-    model_config = {"env_file": ".env"}  # Путь к файлу окружения
+    # Используем SettingsConfigDict для указания нужного env-файла
+    model_config = SettingsConfigDict(env_file="/.env")
 
 
 # Создание объекта настроек приложения
 settings = Settings()
+
+print(f"Окружение: {settings.MODE}")
